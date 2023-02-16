@@ -1,32 +1,50 @@
-import propTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteContact } from 'redux/reducer';
+import { getFilter, getItem } from 'redux/selector';
 import css from './ContactDelete.module.css';
 
-export const ContactDelete = ({ contacts, handleOnDelete }) => (
-  <div className={css.wraperContactList}>
+
+export const ContactDelete = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getItem);
+  const filter = useSelector(getFilter);
+
+  function contactsFillet() {
+    if (filter === '') {
+      return false;
+    }
+
+    return contacts.filter(e => e.name.toLowerCase().includes(filter));
+  }
+
+  const fillter = contactsFillet();
+
+  const list = fillter ? fillter : contacts;
+
+  return (
+    <>
+        <div className={css.wraperContactList}>
     <ul className={css.contactList}>
-      {contacts.map((contact, id) => (
+      {list.map(({ id, name, number }) => (
         <li key={id} className={css.contactListItem}>
-          {contact.name}: {contact.number}
+          {name}: {number}
           <button
             type="button"
+            name={id}
             className={css.contactListItemBtn}
-            onClick={() => handleOnDelete(contact.id)}
+            onClick={event => dispatch(deleteContact(event.target.name))}
           >
             Delete
           </button>
         </li>
       ))}
     </ul>
-  </div>
-);
+      </div>
+      </>
+  );
+};
 
-ContactDelete.propTypes = {
-    contact: propTypes.arrayOf(propTypes.exact({
-        id: propTypes.number.isRequired,
-        name: propTypes.string.isRequired,
-        number: propTypes.number.isRequired,
-    })
-    ),
-    handleOnDelete: propTypes.func.isRequired,
 
-}
+
+
+

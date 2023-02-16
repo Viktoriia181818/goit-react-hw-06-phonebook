@@ -1,10 +1,9 @@
 import { nanoid } from '@reduxjs/toolkit';
-import propTypes from 'prop-types';
 import React from 'react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { filterValue, newContacts } from 'redux/reducer';
-import { getContacts } from 'redux/selector';
+import { getItem } from 'redux/selector';
 import css from './ContactForm.module.css';
 
 
@@ -17,7 +16,7 @@ const INITIAL_STATE = {
 export const ContactForm = () => {
   const [{ name, number }, setState] = useState(INITIAL_STATE);
   const dispatch = useDispatch();
-  const contacts = useSelector(getContacts)
+  const contacts = useSelector(getItem)
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -26,18 +25,20 @@ export const ContactForm = () => {
 
   const handleFormSubmit = e => {
     e.preventDefault();
-    const newContact = {
-      id: nanoid(),
+    const newC = {
+      id: nanoid(5),
       name,
       number,
     }
-    if (contacts.some(e => e.name === newContact.name)) {
-      alert(`${newContact.name} is already is contacts`);
+    if (contacts.some(e => e.name === newC.name)) {
+      alert(`${newC.name} is already is contacts`);
       return;
     }
     
-    dispatch(newContacts(newContact));
+    dispatch(newContacts(newC));
     dispatch(filterValue(''));
+
+    setState({ ...INITIAL_STATE });
   };
 
   return (
@@ -74,6 +75,3 @@ export const ContactForm = () => {
 };
 
 
-ContactForm.propTypes = {
-    handleOnSubmit: propTypes.func.isRequired,
-}
